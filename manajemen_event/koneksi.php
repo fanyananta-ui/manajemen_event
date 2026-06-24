@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "manajemen_event";
+$user = "ifummiid_kelasc";
+$pass = "pemweb_db_c";
+$db   = "ifummiid_kelasc";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 
