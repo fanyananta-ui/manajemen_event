@@ -6,7 +6,7 @@ if (isset($_POST['login'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password'];
 
-    $query = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
+    $query = mysqli_query($conn, "SELECT * FROM users_fany_2430511045 WHERE username='$username'");
     if (mysqli_num_rows($query) === 1) {
         $row = mysqli_fetch_assoc($query);
         if (password_verify($password, $row['password'])) {
