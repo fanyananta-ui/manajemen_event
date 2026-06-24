@@ -12,7 +12,7 @@ if (isset($_POST['simpan_event'])) {
     $ttd_data      = $_POST['ttd_data']; // Data string Base64 dari Canvas
 
     // Insert ke tabel utama (events)
-    $query = "INSERT INTO events (nama_event, tanggal_event, harga_tiket, lokasi, ttd_panitia) 
+    $query = "INSERT INTO events_fany_2430511045 (nama_event, tanggal_event, harga_tiket, lokasi, ttd_panitia) 
               VALUES ('$nama_event', '$tanggal_event', $harga_tiket, '$lokasi', '$ttd_data')";
     
     if (mysqli_query($conn, $query)) {
@@ -33,7 +33,7 @@ if (isset($_POST['simpan_event'])) {
 
                 if (move_uploaded_file($file_tmp, $target_file)) {
                     // Simpan nama file ke tabel lampiran (event_files)
-                    mysqli_query($conn, "INSERT INTO event_files (event_id, nama_file) VALUES ($event_id, '$file_name')");
+                    mysqli_query($conn, "INSERT INTO event_files_fany_2430511045 (event_id, nama_file) VALUES ($event_id, '$file_name')");
                 }
             }
         }
@@ -48,7 +48,7 @@ if (isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
 
     // Hapus file fisik dari folder uploads terlebih dahulu
-    $file_res = mysqli_query($conn, "SELECT nama_file FROM event_files WHERE event_id = $id");
+    $file_res = mysqli_query($conn, "SELECT nama_file_fany_2430511045 FROM event_files_fany_2430511045 WHERE event_id = $id");
     while ($f = mysqli_fetch_assoc($file_res)) {
         $path = "uploads/" . $f['nama_file'];
         if (file_exists($path)) {
@@ -57,7 +57,7 @@ if (isset($_GET['hapus'])) {
     }
 
     // Hapus data dari database (Relasi ON DELETE CASCADE menghapus file di tabel anak secara otomatis)
-    mysqli_query($conn, "DELETE FROM events WHERE id = $id");
+    mysqli_query($conn, "DELETE FROM event_fany_2430511045 WHERE id = $id");
     header("Location: index.php");
 }
 ?>
