@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nama_event']) && !iss
         move_uploaded_file($_FILES['file_event']['tmp_name'], 'uploads/' . $namaFile);
     }
 
-    $query = "INSERT INTO event (nama_event, tanggal_event, lokasi, file_event, signature) 
+    $query = "INSERT INTO event_fany_2430511045 (nama_event, tanggal_event, lokasi, file_event, signature) 
               VALUES ('$nama', '$tanggal', '$lokasi', '$namaFile', '$signature_base64')";
     if (mysqli_query($conn, $query)) {
         echo 'sukses';
@@ -58,7 +58,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit_event') {
         }
         if (move_uploaded_file($_FILES['file_event']['tmp_name'], 'uploads/' . $namaFile)) {
             // Hapus file lama secara fisik dari server agar hemat penyimpanan
-            $old_file_query = mysqli_query($conn, "SELECT file_event FROM event WHERE id = $id");
+            $old_file_query = mysqli_query($conn, "SELECT file_event_fany_2430511045 FROM event_fany_2430511045 WHERE id = $id");
             if ($old_row = mysqli_fetch_assoc($old_file_query)) {
                 $old_file = 'uploads/' . $old_row['file_event'];
                 if ($old_row['file_event'] != 'Tidak Ada File' && file_exists($old_file)) {
@@ -76,7 +76,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit_event') {
         $signature_update_sql = ", signature='$signature_base64'";
     }
 
-    $query = "UPDATE event SET nama_event='$nama', tanggal_event='$tanggal', lokasi='$lokasi' $file_update_sql $signature_update_sql WHERE id = $id";
+    $query = "UPDATE event_fany_2430511045 SET nama_event='$nama', tanggal_event='$tanggal', lokasi='$lokasi' $file_update_sql $signature_update_sql WHERE id = $id";
     if (mysqli_query($conn, $query)) {
         echo 'sukses';
     } else {
@@ -90,7 +90,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_event') {
     $id = intval($_POST['id']);
     
     // Ambil info nama berkas untuk dihapus dari penyimpanan lokal sebelum row dihilangkan
-    $file_query = mysqli_query($conn, "SELECT file_event FROM event WHERE id = $id");
+    $file_query = mysqli_query($conn, "SELECT file_event_fany_2430511045 FROM event_fany_2430511045 WHERE id = $id");
     if ($row = mysqli_fetch_assoc($file_query)) {
         $file = "uploads/" . $row['file_event'];
         if ($row['file_event'] != 'Tidak Ada File' && file_exists($file)) {
@@ -98,7 +98,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_event') {
         }
     }
 
-    $query = "DELETE FROM event WHERE id = $id";
+    $query = "DELETE FROM event_fany_2430511045 WHERE id = $id";
     if (mysqli_query($conn, $query)) {
         echo 'sukses';
     } else {
@@ -108,13 +108,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_event') {
 }
 
 // QUERY UTK DATA KARTU STATISTIK DASHBOARD REALTIME
-$q_total = mysqli_query($conn, "SELECT COUNT(*) as total FROM event");
+$q_total = mysqli_query($conn, "SELECT COUNT(*) as total FROM event_fany_2430511045");
 $r_total = mysqli_fetch_assoc($q_total)['total'] ?? 0;
 
-$q_aktif = mysqli_query($conn, "SELECT COUNT(*) as aktif FROM event WHERE tanggal_event >= CURDATE()");
+$q_aktif = mysqli_query($conn, "SELECT COUNT(*) as aktif FROM event_fany_2430511045 WHERE tanggal_event >= CURDATE()");
 $r_aktif = mysqli_fetch_assoc($q_aktif)['aktif'] ?? 0;
 
-$q_selesai = mysqli_query($conn, "SELECT COUNT(*) as selesai FROM event WHERE tanggal_event < CURDATE()");
+$q_selesai = mysqli_query($conn, "SELECT COUNT(*) as selesai FROM event_fany_2430511045 WHERE tanggal_event < CURDATE()");
 $r_selesai = mysqli_fetch_assoc($q_selesai)['selesai'] ?? 0;
 
 // Cek apakah user sudah login atau belum untuk menentukan tampilan awal HTML
@@ -228,7 +228,7 @@ $sudah_login = (isset($_SESSION['is_logged_in']) && $_SESSION['is_logged_in'] ==
                 <tbody>
                 <?php
                 $no = 1;
-                $data = mysqli_query($conn, "SELECT * FROM event ORDER BY id ASC");
+                $data = mysqli_query($conn, "SELECT * FROM event_fany_2430511045 ORDER BY id ASC");
                 while($row = mysqli_fetch_assoc($data)){
                 ?>
                 <tr>
@@ -261,7 +261,9 @@ $sudah_login = (isset($_SESSION['is_logged_in']) && $_SESSION['is_logged_in'] ==
                                 data-signature="<?= $row['signature']; ?>">
                             <i class="bi bi-pencil-square"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm" onclick="hapusData(this, <?= $row['id']; ?>)"><i class="bi bi-trash"></i></button>
+                       <a href="#" class="btn btn-danger btn-sm" onclick="hapusData(this, <?= $row['id']; ?>)">
+                            <i class="bi bi-trash"></i>
+                        </a>
                     </td>
                 </tr>
                 <?php } ?>
@@ -418,26 +420,23 @@ $sudah_login = (isset($_SESSION['is_logged_in']) && $_SESSION['is_logged_in'] ==
         });
     }
 
-    // CRUD: Delete
-    function hapusData(button, id){
-        Swal.fire({
-            title: 'Apakah anda yakin?',
-            text: "Data akan dihapus permanen dari database!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Hapus!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('', { action: 'delete_event', id: id }, function(response){
-                    if(response.trim() === 'sukses') {
-                        Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success').then(() => { location.reload(); });
-                    }
-                });
-            }
-        });
-    }
+    // CRUD: Delete - Versi Baru yang Stabil
+function hapusData(button, id){
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Data akan dihapus permanen dari database!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Langsung arahkan ke hapus.php yang sudah kita perbaiki
+            window.location.href = "hapus.php?id=" + id;
+        }
+    });
+}
 
     // Ambil data lama & muat ke form modal edit beserta review berkas/ttd yang tersimpan
     let selectedRow; 
