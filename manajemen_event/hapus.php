@@ -1,34 +1,26 @@
 <?php
-
 include 'koneksi.php';
 
-$id = $_GET['id'] ?? '';
+// Ambil ID dari URL
+$id = $_GET['id'];
 
-if($id == ''){
-    die('ID tidak ditemukan');
-}
+// 1. Ambil nama file dari kolom yang benar yaitu 'file_event'
+$sql = "SELECT file_event FROM event_fany_2430511045 WHERE id='$id'";
+$query = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($query);
 
-$data = mysqli_query(
-    $conn,
-    "SELECT file_event FROM event WHERE id='$id'"
-);
-
-$row = mysqli_fetch_assoc($data);
-
-if($row && $row['file_event'] != ''){
-
-    $file = "uploads/" . $row['file_event'];
-
-    if(file_exists($file)){
-        unlink($file);
+// 2. Hapus file fisik jika ada
+if($row && !empty($row['file_event'])) {
+    $file_path = 'uploads/' . $row['file_event'];
+    if(file_exists($file_path)) {
+        unlink($file_path);
     }
 }
 
-mysqli_query(
-    $conn,
-    "DELETE FROM event WHERE id='$id'"
-);
+// 3. Hapus data dari database
+mysqli_query($conn, "DELETE FROM event_fany_2430511045 WHERE id='$id'");
 
+// 4. Kembali ke halaman utama
 header("Location: index.php");
-exit;
+exit();
 ?>
